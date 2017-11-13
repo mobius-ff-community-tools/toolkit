@@ -4,6 +4,7 @@ import { AbilityCategory } from './ability-category.enum';
 export class AutoAbility {
     constructor(public readonly name: string,
                 public readonly description: string,
+                public readonly thumbnailUrl: string,
                 public readonly category: AbilityCategory,
                 public readonly modifiers: Modifier[]) {}
 }
