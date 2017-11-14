@@ -3,7 +3,7 @@ export * from './auto-ability.model';
 export * from './card.model';
 export * from './extra-skill.model';
 export * from './job.model';
-export * from './modifier-application.enum';
+export * from './modifier-context.enum';
 export * from './modifier-kind.enum';
 export * from './modifier.model';
 export * from './mp-role.model';

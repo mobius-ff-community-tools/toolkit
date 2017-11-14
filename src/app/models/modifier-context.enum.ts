@@ -1,4 +1,4 @@
-export const enum ModifierApplication {
+export const enum ModifierContext {
     None,
     Damage          = 1 << 1,
     BreakReduction  = 1 << 2,
