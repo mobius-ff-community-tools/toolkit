@@ -54,14 +54,29 @@
                 </div>
             </fieldset>
         </div>
-        <div class="list-group-item">
-            <h5 class="mb-0">Total Break Power: {{ totalBreakPower }}</h5>
+        <div class="list-group-item" [hidden]="!breakDamageForm.valid">
+            <h5 class="mt-2">Total Break Power: {{ totalBreakPower }}</h5>
         </div>
         <div class="list-group-item">
             <fieldset class="form-group">
-                <label for="inputTargetBreakGauge">Target's Break Gauge</label>
-                <input type="number" class="form-control" id="inputTargetBreakGauge" formControlName="targetBreakGauge" />
+                <h5>Target Statistics</h5>
+                <div class="form-row">
+                    <div class="col-md">
+                        <label for="inputTargetBreakGauge">Target's Break Gauge</label>
+                        <input type="number" class="form-control" id="inputTargetBreakGauge" formControlName="targetBreakGauge" />
+                    </div>
+                    <div class="col-md">
+                        <label for="inputNumberOfTaps">Number of Taps</label>
+                        <input type="number" class="form-control" id="inputNumberOfTaps" formControlName="numberOfTaps" />
+                    </div>
+                </div>
             </fieldset>
+        </div>
+        <div class="list-group-item pt-5 pb-5" [hidden]="hideTargetBreakDamageResult">
+            <h5 class="mb-3">Break Damage (100% Reduction)</h5>
+            <div class="progress">
+                <div class="progress-bar bg-danger" role="progressbar" aria-valuemin="0" aria-valuemax="100" [ngStyle]="{ width: targetBreakDamageRatio | percent }" [attr.aria-valuenow]="targetBreakDamageRatio * 100"></div>
+            </div>
         </div>
     </div>
     <div class="card-footer">

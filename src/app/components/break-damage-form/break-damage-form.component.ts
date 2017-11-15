@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Modifier } from '@app/models';
 
 @Component({
@@ -62,15 +62,36 @@ export class BreakDamageFormComponent {
         return result;
     }
 
+    get targetBreakDamageRatio(): number {
+        let result = 0;
+
+        const targetBreakGauge = this.breakDamageForm.get('targetBreakGauge').value;
+        const numberOfTaps = this.breakDamageForm.get('numberOfTaps').value;
+        const totalBreakPower = this.totalBreakPower;
+
+        result = Math.min(1, Math.max(0, (targetBreakGauge - (totalBreakPower * numberOfTaps)) / targetBreakGauge));
+
+        console.log(`BreakDamageFormComponent#targetBreakDamageRatio - result: ${result}`);
+
+        return result;
+    }
+
+    get hideTargetBreakDamageResult(): boolean {
+        return !this.breakDamageForm.valid ||
+            this.breakDamageForm.get('targetBreakGauge').pristine ||
+            this.breakDamageForm.get('numberOfTaps').pristine;
+    }
+
     private initialize() {
         this.breakDamageForm = this.builder.group({
-            baseBreak: '',
+            baseBreak: ['', Validators.required],
             exploitWeakness: '',
             hasBoost: false,
             hasTrance: false,
             hasBDD: false,
             hasEnElement: false,
             hasWeaken: false,
+            numberOfTaps: '',
             piercingBreak: '',
             targetBreakGauge: ''
         });
