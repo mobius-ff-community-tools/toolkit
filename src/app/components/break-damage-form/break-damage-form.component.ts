@@ -1,17 +1,33 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Modifier } from '@app/models';
+import { Modifier, ModifierKind, ModifierContext } from '@app/models';
+import { ModifierFactory } from '@app/factories';
+
+import { inspect } from 'util';
+import * as _ from 'lodash';
+
+import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
 
 @Component({
     selector: 'app-break-damage-form',
     templateUrl: './break-damage-form.component.html',
     styleUrls: ['./break-damage-form.component.css']
 })
-export class BreakDamageFormComponent {
+export class BreakDamageFormComponent implements OnInit{
     breakDamageForm: FormGroup;
 
+    private _modifiersSubject = new BehaviorSubject<Modifier[]>([]);
+
     constructor(private builder: FormBuilder) {
-        this.initialize();
+        this.createForm();
+    }
+
+    get modifiers$(): Observable<Modifier[]> {
+        return this._modifiersSubject.asObservable();
     }
 
     get totalBreakPower(): number {
@@ -82,7 +98,11 @@ export class BreakDamageFormComponent {
             this.breakDamageForm.get('numberOfTaps').pristine;
     }
 
-    private initialize() {
+    ngOnInit() {
+        this.observeFormChanges();
+    }
+
+    private createForm() {
         this.breakDamageForm = this.builder.group({
             baseBreak: ['', Validators.required],
             exploitWeakness: '',
@@ -95,5 +115,44 @@ export class BreakDamageFormComponent {
             piercingBreak: '',
             targetBreakGauge: ''
         });
+    }
+
+    private observeFormChanges() {
+        const context = `BreakDamageFormComponent#observeFormChanges`;
+        const logWithContext = _.bind(this.logModifierArray, this, context);
+        const createModifierArray = _.bind(this.createModifierArrayFromChanges, this);
+
+        this.breakDamageForm
+            .valueChanges.filter(() => this.breakDamageForm.valid, this)
+            .map(createModifierArray)
+            .do(logWithContext)
+            .subscribe(this._modifiersSubject);
+    }
+
+    private logModifierArray(context: String, modifiers: Modifier[]) {
+        console.log(`BreakDamageFormComponent#logModifierArray`);
+        console.log(`\tContext: ${context}`);
+        console.log(`\tModifiers: ${inspect(modifiers)}`);
+    }
+
+    private createModifierArrayFromChanges(changes: any): Modifier[] {
+        const result = _.transform(changes, this.transformChange, []);
+        return result;
+    }
+
+    private transformChange(result: Modifier[], value: any, key: string, object: any) {
+        switch(key) {
+            case 'baseBreak':
+                result.push(ModifierFactory.CreateBaseBreakModifier(value));
+                break;
+            case 'hasBoost':
+                result.push(ModifierFactory.CreateBoostModifier());
+                break;
+            case 'hasTrance':
+                result.push(ModifierFactory.CreateTranceModifier());
+                break;
+            case 'hasBDD':
+                result.push(ModifierFactory.CreateBDDModifier());
+        }
     }
 }
