@@ -2,6 +2,7 @@ export * from './ability-category.enum';
 export * from './auto-ability.model';
 export * from './card.model';
 export * from './extra-skill.model';
+export * from './element.enum';
 export * from './job.model';
 export * from './modifier-context.enum';
 export * from './modifier-trait.enum';

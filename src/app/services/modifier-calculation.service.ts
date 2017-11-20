@@ -5,13 +5,17 @@ import { Observable } from 'rxjs/Observable';
 
 import * as _ from 'lodash';
 
-import { Modifier, ModifierContext, ModifierTrait } from '@app/models';
+import { AnyElement, Element, Modifier, ModifierContext, ModifierTrait } from '@app/models';
 
 @Injectable()
 export class ModifierCalculationService {
 
     get breakTraits(): ModifierTrait[] {
-        return [ModifierTrait.BaseValue, ModifierTrait.Boon];
+        return [ModifierTrait.BaseValue,
+            ModifierTrait.Boon,
+            ModifierTrait.Fractal,
+            ModifierTrait.Imbue,
+            ModifierTrait.Weakness];
     }
 
     calculateBreakDamage(source: Observable<Modifier[]> | Modifier[]): Observable<number> | number {
@@ -25,11 +29,33 @@ export class ModifierCalculationService {
     private _calculateBreakDamage(source: Modifier[]): number {
         const filteredModifiers = _.filter(source, (modifier) => modifier.context === ModifierContext.BreakDamage);
         const modifierMap = this._createModifierMap(filteredModifiers, this.breakTraits, {});
-        let result = _.sum(modifierMap[ModifierTrait.BaseValue]);
-        const [independentBoons, additiveBoons] = this._partitionByTraits(modifierMap[ModifierTrait.Boon], ModifierTrait.Independent);
-        const boons = _.concat(independentBoons, _.sumBy(additiveBoons, 'value') + 1);
-        result = _.reduce(boons, (total, modifier) => total * modifier.value, result);
+        let result = this._calculateBaseBreak(modifierMap[ModifierTrait.BaseValue]);
+        result *= this._calculateTraitMultiplier(modifierMap, ModifierTrait.Fractal);
+        result *= this._calculateTraitMultiplier(modifierMap, ModifierTrait.Boon);
+
+        // TODO: Get target element
+        if (this._hasImbue(modifierMap[ModifierTrait.Imbue], AnyElement)) {
+            result *= this._calculateTraitMultiplier(modifierMap, ModifierTrait.Weakness);
+        }
         return result;
+    }
+
+    private _hasImbue(modifiers: Modifier[], targetElement: Element): boolean {
+        return _.some(modifiers, (modifier) =>
+            modifier.trait === ModifierTrait.Imbue && (modifier.value & targetElement));
+    }
+
+    private _calculateBaseBreak(modifiers: Modifier[]): number {
+        const [independent, additive] = this._partitionByTraits(modifiers, ModifierTrait.Independent);
+        const result = _.sumBy(additive, (modifier) => modifier.value);
+        return _.reduce(independent, (total, modifier) => total * modifier.value, result);
+    }
+
+    private _calculateTraitMultiplier(map: ModifierMap, trait: ModifierTrait): number {
+        const modifiers = map[trait];
+        const [independent, additive] = this._partitionByTraits(modifiers, ModifierTrait.Independent);
+        const multiplier = _.sumBy(additive, (modifier) => modifier.value) + 1;
+        return  _.reduce(independent, (total, modifier) => total * (1 + modifier.value), multiplier);
     }
 
     private _partitionByTraits(source: Modifier[], traits: ModifierTrait): Modifier[][] {
