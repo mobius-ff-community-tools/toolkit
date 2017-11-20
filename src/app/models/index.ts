@@ -4,7 +4,7 @@ export * from './card.model';
 export * from './extra-skill.model';
 export * from './job.model';
 export * from './modifier-context.enum';
-export * from './modifier-kind.enum';
+export * from './modifier-trait.enum';
 export * from './modifier.model';
 export * from './mp-role.model';
 export * from './panel.model';

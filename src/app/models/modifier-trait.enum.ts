@@ -1,4 +1,4 @@
-export const enum ModifierKind {
+export const enum ModifierTrait {
     None,
     Damage           = 1 << 1,
     Magic            = 1 << 2,

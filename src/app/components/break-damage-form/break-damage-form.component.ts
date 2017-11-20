@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Modifier, ModifierKind, ModifierContext } from '@app/models';
+import { Modifier, ModifierTrait, ModifierContext } from '@app/models';
 import { ModifierFactory } from '@app/factories';
 
 import { inspect } from 'util';
