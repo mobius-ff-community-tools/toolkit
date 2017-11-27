@@ -15,3 +15,38 @@ export const enum ModifierTrait {
     Percentage       = 1 << 12,
     Weakness         = 1 << 13
 }
+
+export function modifierTraitToString(trait: ModifierTrait): string {
+    switch (trait) {
+        case ModifierTrait.None:
+            return 'None';
+        case ModifierTrait.Ailment:
+            return 'Ailment';
+        case ModifierTrait.BaseValue:
+            return 'Base Value';
+        case ModifierTrait.Boon:
+            return 'Boon';
+        case ModifierTrait.Break:
+            return 'Break';
+        case ModifierTrait.Critical:
+            return 'Critical';
+        case ModifierTrait.Damage:
+            return 'Damage';
+        case ModifierTrait.ElementEnhance:
+            return 'Enhance Element';
+        case ModifierTrait.Fractal:
+            return 'Fractal';
+        case ModifierTrait.Imbue:
+            return 'Imbue';
+        case ModifierTrait.Independent:
+            return 'Independent';
+        case ModifierTrait.Magic:
+            return 'Magic';
+        case ModifierTrait.Multiplayer:
+            return 'Multiplayer';
+        case ModifierTrait.Percentage:
+            return 'Percentage';
+        case ModifierTrait.Weakness:
+            return 'Weakness';
+    }
+}

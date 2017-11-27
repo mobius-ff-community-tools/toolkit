@@ -8,8 +8,17 @@ export class Modifier {
                 public context: ModifierContext) { }
 
     get value(): number {
-        return  (this.traits & ModifierTrait.Percentage) ?
-            this._value / 100 : this._value;
+        let result = this._value;
+
+        if (this.traits & ModifierTrait.Percentage) {
+            result = result / 100;
+
+            if (this.traits & ModifierTrait.Independent) {
+                result += 1;
+            }
+        }
+
+        return result;
     }
 
     toString(): string {

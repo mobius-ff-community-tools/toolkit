@@ -1,3 +1,4 @@
+import { MobiusFfToolkitPage } from '../../../e2e/app.po';
 import { Modifier, ModifierTrait, ModifierContext } from '@app/models';
 import { inspect } from 'util';
 
@@ -32,5 +33,15 @@ export class ModifierFactory {
     static CreateWeakenModifier(): Modifier {
         const traits = ModifierTrait.ElementEnhance;
         return ModifierFactory.CreateModifier(0.5, 'Weaken', traits, ModifierContext.BreakDamage);
+    }
+
+    static CreateFractalModifier(stat: ModifierContext, value: number): Modifier {
+        const traits = ModifierTrait.Fractal | ModifierTrait.Percentage;
+        return ModifierFactory.CreateModifier(value, 'Break Power Fractal', traits, ModifierContext.BreakDamage);
+    }
+
+    static CreateCustomPanelModifier(stat: ModifierContext, value: number): Modifier {
+        const traits = ModifierTrait.BaseValue;
+        return ModifierFactory.CreateModifier(value, 'Break Custom Panel', traits, ModifierContext.BreakDamage);
     }
 }

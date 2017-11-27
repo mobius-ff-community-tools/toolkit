@@ -1,17 +1,20 @@
+import { inspect } from 'util';
 import { Injectable } from '@angular/core';
-import { isObservable } from '@angular/core/src/util/lang';
 
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
 import * as _ from 'lodash';
 
-import { AnyElement, Element, Modifier, ModifierContext, ModifierTrait } from '@app/models';
+import { AnyElement, Element, Modifier, ModifierContext, ModifierTrait, modifierTraitToString } from '@app/models';
 
 @Injectable()
 export class ModifierCalculationService {
 
     get breakTraits(): ModifierTrait[] {
-        return [ModifierTrait.BaseValue,
+        return [
+            ModifierTrait.Ailment,
+            ModifierTrait.BaseValue,
             ModifierTrait.Boon,
             ModifierTrait.Fractal,
             ModifierTrait.Imbue,
@@ -19,8 +22,8 @@ export class ModifierCalculationService {
     }
 
     calculateBreakDamage(source: Observable<Modifier[]> | Modifier[]): Observable<number> | number {
-        if (isObservable(source)) {
-            return source.map(this._calculateBreakDamage);
+        if (source instanceof Observable) {
+            return source.map(_.bind(this._calculateBreakDamage, this));
         } else {
             return this._calculateBreakDamage(source);
         }
@@ -32,6 +35,7 @@ export class ModifierCalculationService {
         let result = this._calculateBaseBreak(modifierMap[ModifierTrait.BaseValue]);
         result *= this._calculateTraitMultiplier(modifierMap, ModifierTrait.Fractal);
         result *= this._calculateTraitMultiplier(modifierMap, ModifierTrait.Boon);
+        result *= this._calculateTraitMultiplier(modifierMap, ModifierTrait.Ailment);
 
         // TODO: Get target element
         if (this._hasImbue(modifierMap[ModifierTrait.Imbue], AnyElement)) {
@@ -55,11 +59,13 @@ export class ModifierCalculationService {
         const modifiers = map[trait];
         const [independent, additive] = this._partitionByTraits(modifiers, ModifierTrait.Independent);
         const multiplier = _.sumBy(additive, (modifier) => modifier.value) + 1;
-        return  _.reduce(independent, (total, modifier) => total * (1 + modifier.value), multiplier);
+        console.log(`_calculateTraitMultiplier for ${modifierTraitToString(trait)}: \
+            additive multiplier: ${multiplier} independent multipliers: ${inspect(independent)}`);
+        return  _.reduce(independent, (total, modifier) => total * (modifier.value), multiplier);
     }
 
     private _partitionByTraits(source: Modifier[], traits: ModifierTrait): Modifier[][] {
-        return (source.length > 0) ? _.partition(source, (modifier) => modifier.traits & traits) : [[], []];
+        return (source && source.length > 0) ? _.partition(source, (modifier) => modifier.traits & traits) : [[], []];
     }
 
     private _createModifierMap(source: Modifier[], traits: ModifierTrait[], accumulator: ModifierMap): ModifierMap {
