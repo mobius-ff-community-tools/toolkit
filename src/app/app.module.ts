@@ -4,14 +4,17 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from '@components/app/app.component';
-import { BreakDamageFormComponent } from '@components/break-damage-form/break-damage-form.component';
+import { BreakDamageFormComponent } from '@components/break-damage-form';
+import { CheckboxButtonComponent, CheckboxButtonContentDirective } from '@components/checkbox-button';
 
 import { AppService } from '@services/app.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    BreakDamageFormComponent
+    BreakDamageFormComponent,
+    CheckboxButtonComponent,
+    CheckboxButtonContentDirective
   ],
   imports: [
     BrowserModule,

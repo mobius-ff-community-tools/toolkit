@@ -18,7 +18,8 @@ export class ModifierCalculationService {
             ModifierTrait.Boon,
             ModifierTrait.Fractal,
             ModifierTrait.Imbue,
-            ModifierTrait.Weakness];
+            ModifierTrait.Weakness
+        ];
     }
 
     calculateBreakDamage(source: Observable<Modifier[]> | Modifier[]): Observable<number> | number {

@@ -1,0 +1,11 @@
+.btn:not([disabled]):not(.disabled).active {
+    background-color: #F00;
+}
+
+:host /deep/ .btn span.fa {
+    display: none;
+}
+
+:host /deep/ .btn.active span.fa {
+    display: inline;
+}

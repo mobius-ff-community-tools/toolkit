@@ -4,33 +4,46 @@
         <div class="list-group-item">
             <fieldset class="form-group">
                 <h5>Modifiers</h5>
-                <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="checkbox" formControlName="hasBoost" value="" />
+                <app-checkbox-button class="form-check form-check-inline">
+                    <label class="form-check-label" app-checkbox-button-content>
+                        <input class="form-check-input" type="checkbox" [formControl]="breakDamageForm.controls.hasBoost" autocomplete="off" />
+                        Boost
+                    </label>
+                </app-checkbox-button>
+                <!--
+                <div class="form-check form-check-inline" data-toggle="buttons">
+                    <label class="form-check-label btn btn-secondary">
+                        <input class="form-check-input" type="checkbox" formControlName="hasBoost" autocomplete="off" />
+                        <span class="fa fa-check-circle" aria-hidden="true"></span>
                         Boost
                     </label>
                 </div>
+                -->
                 <div class="form-check form-check-inline">
                     <label class="form-check-label">
                         <input class="form-check-input" type="checkbox" formControlName="hasTrance" value="" />
+                        <span class="fa fa-check-circle" aria-hidden="true"></span>
                         Trance
                     </label>
                 </div>
                 <div class="form-check form-check-inline">
                     <label class="form-check-label">
                         <input class="form-check-input" type="checkbox" formControlName="hasBDD" value="" />
+                        <span class="fa fa-check-circle" aria-hidden="true"></span>
                         Break Defense Down
                     </label>
                 </div>
                 <div class="form-check form-check-inline">
                     <label class="form-check-label">
                         <input class="form-check-input" type="checkbox" formControlName="hasEnElement" value="" />
+                        <span class="fa fa-check-circle" aria-hidden="true"></span>
                         EnElement
                     </label>
                 </div>
                 <div class="form-check form-check-inline">
                     <label class="form-check-label">
                         <input class="form-check-input" type="checkbox" formControlName="hasWeaken" value="" />
+                        <span class="fa fa-check-circle" aria-hidden="true"></span>
                         Weaken
                     </label>
                 </div>
