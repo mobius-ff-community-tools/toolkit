@@ -1,11 +1,19 @@
-.btn:not([disabled]):not(.disabled).active {
-    background-color: #F00;
+:host /deep/ .btn:not([disabled]):not(.disabled).active {
+    background-color: #08B;
 }
 
 :host /deep/ .btn span.fa {
     display: none;
 }
 
+:host /deep/ .btn {
+    padding: .375rem 1.31rem;
+}
+
 :host /deep/ .btn.active span.fa {
     display: inline;
+}
+
+:host /deep/ .btn.active {
+    padding: .375rem .75rem;
 }

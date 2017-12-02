@@ -20,6 +20,8 @@ import 'rxjs/add/operator/map';
 export class BreakDamageFormComponent implements OnInit{
     breakDamageForm: FormGroup;
 
+    debugInfoCollapsed = true;
+
     private _modifiersSubject = new BehaviorSubject<Modifier[]>([]);
 
     constructor(private builder: FormBuilder) {
@@ -77,10 +79,8 @@ export class BreakDamageFormComponent implements OnInit{
 
         return result;
     }
-
     get targetBreakDamageRatio(): number {
         let result = 0;
-
         const targetBreakGauge = this.breakDamageForm.get('targetBreakGauge').value;
         const numberOfTaps = this.breakDamageForm.get('numberOfTaps').value;
         const totalBreakPower = this.totalBreakPower;
