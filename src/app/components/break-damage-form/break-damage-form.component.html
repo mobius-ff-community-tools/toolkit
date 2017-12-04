@@ -41,15 +41,15 @@
                 <div class="form-row">
                     <div class="col-md">
                         <label for="inputBaseBreak">Base Break Power</label>
-                        <input type="number" class="form-control" id="inputBaseBreak" formControlName="baseBreak" />
+                        <input type="number" class="form-control" id="inputBaseBreak" formControlName="baseBreak" min="0" />
                     </div>
                     <div class="col-md">
                         <label for="inputExploitWeakness">Exploit Weakness</label>
-                        <input type="number" class="form-control" id="inputExploitWeakness" formControlName="exploitWeakness" />
+                        <input type="number" class="form-control" id="inputExploitWeakness" formControlName="exploitWeakness" min="0" />
                     </div>
                     <div class="col-md">
                         <label for="inputPiercingBreak">Piercing Break</label>
-                        <input type="number" class="form-control" id="inputPiercingBreak" formControlName="piercingBreak" />
+                        <input type="number" class="form-control" id="inputPiercingBreak" formControlName="piercingBreak" min="0" />
                     </div>
                 </div>
             </fieldset>
@@ -63,11 +63,11 @@
                 <div class="form-row">
                     <div class="col-md">
                         <label for="inputTargetBreakGauge">Target's Break Gauge</label>
-                        <input type="number" class="form-control" id="inputTargetBreakGauge" formControlName="targetBreakGauge" />
+                        <input type="number" class="form-control" id="inputTargetBreakGauge" formControlName="targetBreakGauge" min="0" />
                     </div>
                     <div class="col-md">
                         <label for="inputNumberOfTaps">Number of Taps</label>
-                        <input type="number" class="form-control" id="inputNumberOfTaps" formControlName="numberOfTaps" />
+                        <input type="number" class="form-control" id="inputNumberOfTaps" formControlName="numberOfTaps" min="0" />
                     </div>
                 </div>
             </fieldset>
@@ -80,9 +80,9 @@
         </div>
     </div>
     <div class="card-footer">
-        <button class="btn btn-light" 
+        <button class="btn btn-light"
             (click)="debugInfoCollapsed = !debugInfoCollapsed"
-            [attr.aria-expanded]="!debugInfoCollapsed" 
+            [attr.aria-expanded]="!debugInfoCollapsed"
             aria-controls="debug-info">Show Debug Info</button>
         <fieldset id="debug-info" class="form-group debug-info mt-3" [ngbCollapse]="debugInfoCollapsed">
             <h5>Current Form Value:</h5>

@@ -15,6 +15,7 @@ import { CheckboxButtonComponent, CheckboxButtonContentDirective } from '@compon
 
 // Services
 import { AppService } from '@services/app.service';
+import { ModifierCalculationService } from '@services/modifier-calculation.service';
 
 // Misc
 import { environment } from '@env/environment';
@@ -37,7 +38,7 @@ import { getLogLevel } from '@app/utilities';
         serverLogLevel: NgxLoggerLevel.ERROR
     })
   ],
-  providers: [AppService],
+  providers: [ AppService, ModifierCalculationService ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
