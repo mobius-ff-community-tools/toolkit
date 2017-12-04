@@ -1,5 +1,6 @@
 import { AfterContentInit, Component, ContentChild, Directive, ElementRef, HostBinding, Renderer2 } from '@angular/core';
 import { inspect } from 'util';
+import { NGXLogger } from 'ngx-logger';
 
 @Directive({
     selector: '[app-checkbox-button-content], [appCheckboxButtonContent]'
@@ -21,18 +22,24 @@ export class CheckboxButtonComponent implements AfterContentInit {
     @ContentChild(CheckboxButtonContentDirective)
     label: CheckboxButtonContentDirective;
 
-    constructor(private renderer: Renderer2) {}
+    constructor(private renderer: Renderer2, private logger: NGXLogger) {}
 
     ngAfterContentInit() {
-        console.log('CheckboxButtonComponent#ngAfterContentInit');
-        console.log(`\tlabel: ${inspect(this.label)}`)
-        this.renderer.addClass(this.label.element.nativeElement, 'btn');
-        this.renderer.addClass(this.label.element.nativeElement, 'btn-secondary');
+        this.logger.debug('CheckboxButtonComponent#ngAfterContentInit');
+        this.logger.debug(`\tlabel:${this.label}`);
+        this.logger.debug(`\t\t${inspect(this.label)}`);
+        this.logger.debug(`\tfirst child:${this.label.element.nativeElement.firstChild}`);
+        this.logger.debug(`\t\t${inspect(this.label.element.nativeElement.firstChild)}`);
+
         const icon = this.createIcon();
+
+        this.logger.debug(`\ticon: ${icon}`);
+        this.logger.debug(`\t\t${inspect(icon)}`);
+
         this.renderer.insertBefore(this.label.element.nativeElement, icon, this.label.element.nativeElement.firstChild);
     }
 
-    private createIcon(kind = 'fa-check-circle'): any {
+    private createIcon(kind = 'fa-check-circle'): HTMLSpanElement {
         const icon = this.renderer.createElement('span');
         this.renderer.addClass(icon, 'fa');
         this.renderer.addClass(icon, kind);
