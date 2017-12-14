@@ -1,0 +1,101 @@
+<form [formGroup]="breakDamageForm" class="card" novalidate autocomplete="off">
+    <legend class="card-header">Break Damage Calculation</legend>
+    <div class="list-group list-group-flush">
+        <div class="list-group-item">
+            <fieldset class="form-group">
+                <h5>Modifiers</h5>
+                <app-checkbox-button class="form-check form-check-inline">
+                    <label class="form-check-label" app-checkbox-button-content ngbButtonLabel>
+                        <input class="form-check-input" type="checkbox" [formControl]="breakDamageForm.controls.hasBoost" autocomplete="off" ngbButton />
+                        Boost
+                    </label>
+                </app-checkbox-button>
+                <app-checkbox-button class="form-check form-check-inline">
+                    <label class="form-check-label" app-checkbox-button-content ngbButtonLabel>
+                        <input class="form-check-input" type="checkbox" [formControl]="breakDamageForm.controls.hasTrance" autocomplete="off" ngbButton />
+                        Trance
+                    </label>
+                </app-checkbox-button>
+                <app-checkbox-button class="form-check form-check-inline">
+                    <label class="form-check-label" app-checkbox-button-content ngbButtonLabel>
+                        <input class="form-check-input" type="checkbox" [formControl]="breakDamageForm.controls.hasBDD" autocomplete="off" ngbButton />
+                        Break Defense Down
+                    </label>
+                </app-checkbox-button>
+                <app-checkbox-button class="form-check form-check-inline">
+                    <label class="form-check-label" app-checkbox-button-content ngbButtonLabel>
+                        <input class="form-check-input" type="checkbox" [formControl]="breakDamageForm.controls.hasEnElement" autocomplete="off" ngbButton />
+                        EnElement
+                    </label>
+                </app-checkbox-button>
+                <app-checkbox-button class="form-check form-check-inline">
+                    <label class="form-check-label" app-checkbox-button-content ngbButtonLabel>
+                        <input class="form-check-input" type="checkbox" [formControl]="breakDamageForm.controls.hasWeaken" autocomplete="off" ngbButton />
+                        Weaken
+                    </label>
+                </app-checkbox-button>
+            </fieldset>
+
+            <fieldset class="form-group">
+                <h5>Auto-Abilities</h5>
+                <div class="form-row">
+                    <div class="col-md">
+                        <label for="inputBaseBreak">Base Break Power</label>
+                        <input type="number" class="form-control" id="inputBaseBreak" formControlName="baseBreak" min="0" />
+                    </div>
+                    <div class="col-md">
+                        <label for="inputExploitWeakness">Exploit Weakness</label>
+                        <input type="number" class="form-control" id="inputExploitWeakness" formControlName="exploitWeakness" min="0" />
+                    </div>
+                    <div class="col-md">
+                        <label for="inputPiercingBreak">Piercing Break</label>
+                        <input type="number" class="form-control" id="inputPiercingBreak" formControlName="piercingBreak" min="0" />
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="list-group-item" [hidden]="!breakDamageForm.valid">
+            <h5 class="mt-2">Effective Break Power: {{ effectiveBreakPower$ | async }}</h5>
+        </div>
+        <div class="list-group-item">
+            <fieldset class="form-group">
+                <h5>Target Statistics</h5>
+                <label for="inputTargetPreset">Select Target:</label>
+                <select id="inputTargetPreset" class="form-control mb-2" formControlName="targetPreset">
+                    <option selected disabled>-- Choose a Preset Target --</option>
+                    <option *ngFor="let preset of presets" [value]="preset">{{preset}}</option>
+                </select>
+                <div class="form-row">
+                    <div class="col-md">
+                        <label for="inputTargetBreakDefense">Target Break Defense</label>
+                        <input type="number" class="form-control" id="inputTargetBreakDefense" formControlName="targetBreakDefense" min="0" />
+                    </div>
+                    <div class="col-md">
+                        <label for="inputNumberOfTaps">Number of Taps</label>
+                        <input type="number" class="form-control" id="inputNumberOfTaps" formControlName="numberOfTaps" min="0" />
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="list-group-item pt-5 pb-5" [hidden]="hideTargetBreakDamageResult">
+            <h5 class="mb-3">Target's Break Gauge</h5>
+            <div class="progress">
+                <div class="progress-bar bg-danger" role="progressbar" aria-valuemin="0" aria-valuemax="100" [ngStyle]="{ width: (targetBreakDamageRatio$ | async | percent) }" [attr.aria-valuenow]="(targetBreakDamageRatio$ | async) * 100"></div>
+            </div>
+            <p class="mt-2 text-muted small">Assumes all yellow gauge has been removed.</p>
+        </div>
+    </div>
+    <div class="card-footer">
+        <button class="btn btn-light"
+            (click)="debugInfoCollapsed = !debugInfoCollapsed"
+            [attr.aria-expanded]="!debugInfoCollapsed"
+            aria-controls="debug-info">Show Debug Info</button>
+        <fieldset id="debug-info" class="form-group debug-info mt-3" [ngbCollapse]="debugInfoCollapsed">
+            <h5>Current Form Value:</h5>
+            <pre>
+                <code>{{ breakDamageForm.value | json }}</code>
+            </pre>
+            <h5>Current Form Status: {{ breakDamageForm.status | json }}</h5>
+        </fieldset>
+    </div>
+</form>
