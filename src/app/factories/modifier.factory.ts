@@ -1,4 +1,4 @@
-import { Modifier, ModifierTrait, ModifierContext } from '@app/models';
+import { ImbueElement, Modifier, ModifierTrait, ModifierContext } from '@app/models';
 import { inspect } from 'util';
 
 export class ModifierFactory {
@@ -33,8 +33,13 @@ export class ModifierFactory {
     }
 
     static CreateEnElementModifier(): Modifier {
-        const traits = ModifierTrait.ElementEnhance | ModifierTrait.Imbue;
+        const traits = ModifierTrait.ElementEnhance;
         return ModifierFactory.CreateModifier(0.3, 'EnElement', traits, ModifierContext.BreakDamage);
+    }
+
+    static CreateImbueModifier(element: ImbueElement): Modifier {
+        const traits = ModifierTrait.Imbue;
+        return ModifierFactory.CreateModifier(element, 'Imbue', traits, ModifierContext.BreakDamage);
     }
 
     static CreatePiercingBreakModifier(value: number): Modifier {

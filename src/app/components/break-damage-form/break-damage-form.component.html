@@ -1,4 +1,4 @@
-<form [formGroup]="breakDamageForm" class="card" novalidate>
+<form [formGroup]="breakDamageForm" class="card" novalidate autocomplete="off">
     <legend class="card-header">Break Damage Calculation</legend>
     <div class="list-group list-group-flush">
         <div class="list-group-item">
@@ -55,15 +55,20 @@
             </fieldset>
         </div>
         <div class="list-group-item" [hidden]="!breakDamageForm.valid">
-            <h5 class="mt-2">Total Break Power: {{ totalBreakPower }}</h5>
+            <h5 class="mt-2">Effective Break Power: {{ effectiveBreakPower$ | async }}</h5>
         </div>
         <div class="list-group-item">
             <fieldset class="form-group">
                 <h5>Target Statistics</h5>
+                <label for="inputTargetPreset">Select Target:</label>
+                <select id="inputTargetPreset" class="form-control mb-2" formControlName="targetPreset">
+                    <option selected disabled>-- Choose a Preset Target --</option>
+                    <option *ngFor="let preset of presets" [value]="preset">{{preset}}</option>
+                </select>
                 <div class="form-row">
                     <div class="col-md">
-                        <label for="inputTargetBreakGauge">Target's Break Gauge</label>
-                        <input type="number" class="form-control" id="inputTargetBreakGauge" formControlName="targetBreakGauge" min="0" />
+                        <label for="inputTargetBreakDefense">Target Break Defense</label>
+                        <input type="number" class="form-control" id="inputTargetBreakDefense" formControlName="targetBreakDefense" min="0" />
                     </div>
                     <div class="col-md">
                         <label for="inputNumberOfTaps">Number of Taps</label>
@@ -73,10 +78,11 @@
             </fieldset>
         </div>
         <div class="list-group-item pt-5 pb-5" [hidden]="hideTargetBreakDamageResult">
-            <h5 class="mb-3">Break Damage (100% Reduction)</h5>
+            <h5 class="mb-3">Target's Break Gauge</h5>
             <div class="progress">
-                <div class="progress-bar bg-danger" role="progressbar" aria-valuemin="0" aria-valuemax="100" [ngStyle]="{ width: targetBreakDamageRatio | percent }" [attr.aria-valuenow]="targetBreakDamageRatio * 100"></div>
+                <div class="progress-bar bg-danger" role="progressbar" aria-valuemin="0" aria-valuemax="100" [ngStyle]="{ width: (targetBreakDamageRatio$ | async | percent) }" [attr.aria-valuenow]="(targetBreakDamageRatio$ | async) * 100"></div>
             </div>
+            <p class="mt-2 text-muted small">Assumes all yellow gauge has been removed.</p>
         </div>
     </div>
     <div class="card-footer">

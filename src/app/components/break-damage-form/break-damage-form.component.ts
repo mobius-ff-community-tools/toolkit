@@ -8,6 +8,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/combineLatest';
 
 // Misc
 import { inspect } from 'util';
@@ -15,7 +16,7 @@ import * as _ from 'lodash';
 import { NGXLogger } from 'ngx-logger';
 
 // Application
-import { Modifier, ModifierTrait, ModifierContext } from '@app/models';
+import { AnyElement, Modifier, ModifierTrait, ModifierContext } from '@app/models';
 import { ModifierFactory } from '@app/factories';
 import { ModifierCalculationService } from '@app/services';
 
@@ -29,6 +30,15 @@ export class BreakDamageFormComponent implements OnInit {
 
     debugInfoCollapsed = true;
 
+    targetPresets = {
+        '5* Sicarius (1st Gen)': 70500,
+        '5* Guard': 20000,
+        '4* Sicarius (1st Gen)': 40500,
+        '3* Sicarius (1st Gen)': 30500,
+        '2* Sicarius (1st Gen)': 6500,
+        '1* Sicarius (1st Gen)': 2500
+    };
+
     private _modifiersSubject = new BehaviorSubject<Modifier[]>([]);
     private _effectiveBreakPowerSubject = new BehaviorSubject<number>(0);
     private _tapsSubject = new BehaviorSubject<number>(0);
@@ -40,56 +50,12 @@ export class BreakDamageFormComponent implements OnInit {
         this.createForm();
     }
 
-    get modifiers$(): Observable<Modifier[]> {
-        return this._modifiersSubject.asObservable();
+    get presets(): string[] {
+        return _.keys(this.targetPresets);
     }
 
-    get totalBreakPower(): number {
-        let result = 0;
-
-        if (this.breakDamageForm.valid) {
-            const hasBoost = this.breakDamageForm.get('hasBoost').value;
-            const hasTrance = this.breakDamageForm.get('hasTrance').value;
-            const hasBDD = this.breakDamageForm.get('hasBDD').value;
-            const hasEnElement = this.breakDamageForm.get('hasEnElement').value;
-            const hasWeaken = this.breakDamageForm.get('hasWeaken').value;
-            const piercingBreak = this.breakDamageForm.get('piercingBreak').value;
-
-            result += this.breakDamageForm.get('baseBreak').value;
-
-            if (hasBoost) {
-                result *= 2;
-            }
-
-            if (hasBDD) {
-                result *= 1.5;
-            }
-
-            if (hasTrance) {
-                result *= 1.3;
-            }
-
-            if (hasEnElement) {
-                let elementMultiplier = 1.3;
-                const exploitWeakness = this.breakDamageForm.get('exploitWeakness').value;
-
-                if (exploitWeakness !== '') {
-                    elementMultiplier += (exploitWeakness / 100);
-                }
-
-                if (hasWeaken) {
-                    elementMultiplier += 0.5;
-                }
-
-                result *= elementMultiplier;
-            }
-
-            if (piercingBreak !== '') {
-                result *= (1 + (piercingBreak / 100));
-            }
-        }
-
-        return result;
+    get modifiers$(): Observable<Modifier[]> {
+        return this._modifiersSubject.asObservable();
     }
 
     get effectiveBreakPower$(): Observable<number> {
@@ -104,24 +70,22 @@ export class BreakDamageFormComponent implements OnInit {
         return this._targetBreakDefenseSubject.asObservable();
     }
 
-    get targetBreakDamageRatio(): number {
-        let result = 0;
-        const targetBreakGauge = this.breakDamageForm.get('targetBreakGauge').value;
-        const numberOfTaps = this.breakDamageForm.get('numberOfTaps').value;
-        const totalBreakPower = this.totalBreakPower;
+    get targetBreakDamageRatio$(): Observable<number> {
+        const log = _.bind(this.logger.debug, this.logger, 'BreakDamageFormComponent#targetBreakDamageRatio$');
+        return Observable.combineLatest(this.effectiveBreakPower$, this.targetBreakDefense$, this.taps$,
+            (effectiveBreakPower, breakDefense, taps) => {
+                this.logger.debug('BreakDamageFormComponent#targetBreakDamageRatio$');
+                this.logger.debug(`\teffectiveBreakPower: ${effectiveBreakPower}`);
+                this.logger.debug(`\tbreakDefense: ${breakDefense}`);
+                this.logger.debug(`\ttaps: ${taps}`);
 
-        result = Math.min(1, Math.max(0, (targetBreakGauge - (totalBreakPower * numberOfTaps)) / targetBreakGauge));
-
-        this.logger.debug('BreakDamageFormComponent#targetBreakDamageRatio');
-        this.logger.debug(`\tresult: ${result}`);
-        this.logger.debug(`\t\t${inspect(result)}`);
-
-        return result;
+                return Math.min(1, Math.max(0, (breakDefense - (effectiveBreakPower * taps)) / breakDefense));
+            }).do(log);
     }
 
     get hideTargetBreakDamageResult(): boolean {
         return !this.breakDamageForm.valid ||
-            this.breakDamageForm.get('targetBreakGauge').pristine ||
+            this.breakDamageForm.get('targetBreakDefense').value === 0 ||
             this.breakDamageForm.get('numberOfTaps').pristine;
     }
 
@@ -140,7 +104,8 @@ export class BreakDamageFormComponent implements OnInit {
             hasWeaken: false,
             numberOfTaps: [0, Validators.min(0)],
             piercingBreak: [0, Validators.min(0)],
-            targetBreakGauge: [0, Validators.min(0)]
+            targetBreakDefense: [0, Validators.min(0)],
+            targetPreset: undefined
         });
     }
 
@@ -155,17 +120,25 @@ export class BreakDamageFormComponent implements OnInit {
             .do(logWithContext)
             .subscribe(this._modifiersSubject);
 
-        this.breakDamageForm.get('targetBreakGauge')
+        this.breakDamageForm.get('targetBreakDefense')
             .valueChanges.subscribe(this._targetBreakDefenseSubject);
 
         this.breakDamageForm.get('numberOfTaps')
             .valueChanges.subscribe(this._tapsSubject);
 
-        const calculation = this.calculationService.calculateBreakDamage(this.modifiers$);
+        this.breakDamageForm.get('targetPreset')
+            .valueChanges.filter(_.negate(_.isUndefined))
+            .map((value: string) => this.targetPresets[value])
+            .subscribe((value: number) => {
+                this.breakDamageForm.get('targetBreakDefense').setValue(value);
+            });
+
+        const calculation = this.calculationService
+            .calculateEffectiveBreakPower(this.modifiers$);
 
         if (typeof calculation !== 'number') {
             calculation
-                .do(_.bind(this.logger.debug, this.logger, 'CalculationService#calculateBreakDamage - result'))
+                .do(_.bind(this.logger.debug, this.logger, 'CalculationService#calculateEffectiveBreakPower - result'))
                 .subscribe(this._effectiveBreakPowerSubject);
         }
     }
@@ -183,7 +156,7 @@ export class BreakDamageFormComponent implements OnInit {
     }
 
     private transformChange(result: Modifier[], value: any, key: string, object: any) {
-        switch(key) {
+        switch (key) {
             case 'baseBreak':
                 result.push(ModifierFactory.CreateBaseBreakModifier(value));
                 break;
@@ -210,6 +183,8 @@ export class BreakDamageFormComponent implements OnInit {
             case 'hasEnElement':
                 if (value) {
                     result.push(ModifierFactory.CreateEnElementModifier());
+                    // TODO: Provide the correct element instead of AnyElement
+                    result.push(ModifierFactory.CreateImbueModifier(AnyElement));
                 }
                 break;
             case 'piercingBreak':

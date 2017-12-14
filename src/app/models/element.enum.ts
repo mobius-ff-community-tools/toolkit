@@ -1,4 +1,4 @@
-export const enum Element {
+export const enum ImbueElement {
     None,
     Fire  = 1 << 0,
     Water = 1 << 1,
