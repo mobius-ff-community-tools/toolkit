@@ -3,9 +3,7 @@
 // `ng build --env=prod` then `environment.prod.ts` will be used instead.
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
-declare const require: any;
-
 export const environment = {
   production: false,
-  version: require('../../package.json').version
+  version: '0.0.2'
 };
